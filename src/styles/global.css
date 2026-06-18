@@ -1,0 +1,203 @@
+/* ==========================================================================
+   GLOBAL DESIGN TOKENS
+   Currency & Travel Budget Planner
+   These variables match exactly what was defined in the Figma style guide.
+   Every component should reference these variables instead of hardcoded values.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500&family=Inter:wght@400;500&display=swap');
+
+:root {
+  /* ---------- COLOURS ---------- */
+  --color-ink: #1A1A1A;          /* Primary text, primary buttons, dark cards */
+  --color-cream: #F7F6F3;        /* App background, input fields */
+  --color-white: #FFFFFF;        /* Cards, modals, dropdowns */
+  --color-stone: #E8E6E0;        /* Borders, dividers */
+  --color-ash: #6B6B6B;          /* Secondary text, labels, captions */
+  --color-charcoal: #3D3D3D;     /* Hover state for dark elements */
+
+  /* On-dark text colours (used inside dark cards) */
+  --color-on-dark-primary: #FFFFFF;
+  --color-on-dark-secondary: #888888;
+  --color-on-dark-border: rgba(255, 255, 255, 0.15);
+
+  /* Semantic colours */
+  --color-success-bg: #D4EDDA;
+  --color-success-text: #1A5C2A;
+  --color-warning-bg: #FFF3CD;
+  --color-warning-text: #7C5A00;
+  --color-danger-bg: #FDECEA;
+  --color-danger-text: #9B1C1C;
+  --color-danger-border: #F3B6B8;
+  --color-danger-bg-soft: #FFF5F5;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --text-display: 28px;
+  --text-h1: 22px;
+  --text-h2: 18px;
+  --text-h3: 15px;
+  --text-body: 14px;
+  --text-small: 13px;
+  --text-label: 11px;
+  --text-amount: 26px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.3;
+  --leading-normal: 1.4;
+  --leading-relaxed: 1.5;
+
+  --tracking-label: 0.07em;
+
+  /* ---------- SPACING SCALE ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ---------- BORDER RADIUS ---------- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 100px;
+
+  /* ---------- BORDERS ---------- */
+  --border-width: 1px;
+  --border-width-thin: 0.5px;
+  --border-width-focus: 1.5px;
+
+  /* ---------- COMPONENT HEIGHTS ---------- */
+  --height-input: 48px;
+  --height-input-sm: 40px;
+  --height-button: 48px;
+  --height-button-sm: 36px;
+  --height-pill: 34px;
+  --height-badge: 24px;
+  --height-swap-btn: 36px;
+  --height-icon-box: 36px;
+  --height-icon-box-sm: 24px;
+
+  /* ---------- TRANSITIONS ---------- */
+  --transition-fast: 0.1s ease;
+  --transition-base: 0.15s ease;
+}
+
+/* ==========================================================================
+   GLOBAL RESET & BASE STYLES
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: var(--font-body);
+  border: none;
+  outline: none;
+  background: none;
+  width: 100%;
+}
+
+/* ==========================================================================
+   REUSABLE TEXT STYLE CLASSES
+   Apply these classes directly, or use as reference when styling components
+   ========================================================================== */
+
+.text-display {
+  font-family: var(--font-heading);
+  font-size: var(--text-display);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+  color: var(--color-ink);
+}
+
+.text-h1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-h1);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  color: var(--color-ink);
+}
+
+.text-h2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-h2);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  color: var(--color-ink);
+}
+
+.text-h3 {
+  font-family: var(--font-body);
+  font-size: var(--text-h3);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-normal);
+  color: var(--color-ink);
+}
+
+.text-body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ink);
+}
+
+.text-small {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-relaxed);
+  color: var(--color-ash);
+}
+
+.text-label {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-label);
+  color: var(--color-ash);
+}
+
+.text-label-uppercase {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ash);
+}
+
+.text-amount {
+  font-family: var(--font-heading);
+  font-size: var(--text-amount);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  color: var(--color-ink);
+}

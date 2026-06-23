@@ -1,26 +1,54 @@
 import { useState } from 'react';
-import { IconChevronDown, IconMinus, IconPlus } from '@tabler/icons-react';
+import { IconChevronDown, IconMinus, IconPlus, IconArrowLeft } from '@tabler/icons-react';
 import Button from '../../components/Button/Button';
 import './BudgetSetup.css';
 
+// Updated to perfectly match the unified list structure from CurrencySelector
 const DESTINATIONS = [
-  { code: 'jp', name: 'Japan', currency: 'JPY', symbol: '¥' },
-  { code: 'au', name: 'Australia', currency: 'AUD', symbol: 'A$' },
-  { code: 'gb', name: 'United Kingdom', currency: 'GBP', symbol: '£' },
-  { code: 'us', name: 'United States', currency: 'USD', symbol: '$' },
-  { code: 'fr', name: 'France', currency: 'EUR', symbol: '€' },
-  { code: 'sg', name: 'Singapore', currency: 'SGD', symbol: 'S$' },
-  { code: 'kr', name: 'South Korea', currency: 'KRW', symbol: '₩' },
-  { code: 'th', name: 'Thailand', currency: 'THB', symbol: '฿' },
-  { code: 'id', name: 'Indonesia', currency: 'IDR', symbol: 'Rp' },
-  { code: 'tr', name: 'Turkey', currency: 'TRY', symbol: '₺' },
+  { code: 'ae', name: 'UAE Dirham', currency: 'AED', symbol: 'د.إ' },
+  { code: 'au', name: 'Australian Dollar', currency: 'AUD', symbol: 'A$' },
+  { code: 'bd', name: 'Bangladeshi Taka', currency: 'BDT', symbol: '৳' },
+  { code: 'bh', name: 'Bahraini Dinar', currency: 'BHD', symbol: '.د.ب' },
+  { code: 'bn', name: 'Brunei Dollar', currency: 'BND', symbol: 'B$' },
+  { code: 'ca', name: 'Canadian Dollar', currency: 'CAD', symbol: 'C$' },
+  { code: 'ch', name: 'Swiss Franc', currency: 'CHF', symbol: 'CHF' },
+  { code: 'cn', name: 'Chinese Yuan', currency: 'CNY', symbol: '¥' },
+  { code: 'dk', name: 'Danish Krone', currency: 'DKK', symbol: 'kr' },
+  { code: 'eg', name: 'Egyptian Pound', currency: 'EGP', symbol: 'E£' },
+  { code: 'eu', name: 'Euro', currency: 'EUR', symbol: '€' },
+  { code: 'gb', name: 'British Pound', currency: 'GBP', symbol: '£' },
+  { code: 'hk', name: 'Hong Kong Dollar', currency: 'HKD', symbol: 'HK$' },
+  { code: 'id', name: 'Indonesian Rupiah', currency: 'IDR', symbol: 'Rp' },
+  { code: 'in', name: 'Indian Rupee', currency: 'INR', symbol: '₹' },
+  { code: 'jp', name: 'Japanese Yen', currency: 'JPY', symbol: '¥' },
+  { code: 'kr', name: 'South Korean Won', currency: 'KRW', symbol: '₩' },
+  { code: 'kw', name: 'Kuwaiti Dinar', currency: 'KWD', symbol: 'د.ك' },
+  { code: 'my', name: 'Malaysian Ringgit', currency: 'MYR', symbol: 'RM' },
+  { code: 'no', name: 'Norwegian Krone', currency: 'NOK', symbol: 'kr' },
+  { code: 'nz', name: 'New Zealand Dollar', currency: 'NZD', symbol: 'NZ$' },
+  { code: 'ph', name: 'Philippine Peso', currency: 'PHP', symbol: '₱' },
+  { code: 'pk', name: 'Pakistani Rupee', currency: 'PKR', symbol: '₨' },
+  { code: 'qa', name: 'Qatari Riyal', currency: 'QAR', symbol: 'ر.ق' },
+  { code: 'sa', name: 'Saudi Riyal', currency: 'SAR', symbol: 'ر.س' },
+  { code: 'se', name: 'Swedish Krona', currency: 'SEK', symbol: 'kr' },
+  { code: 'sg', name: 'Singapore Dollar', currency: 'SGD', symbol: 'S$' },
+  { code: 'th', name: 'Thai Baht', currency: 'THB', symbol: '฿' },
+  { code: 'tr', name: 'Turkish Lira', currency: 'TRY', symbol: '₺' },
+  { code: 'tw', name: 'Taiwan Dollar', currency: 'TWD', symbol: 'NT$' },
+  { code: 'us', name: 'US Dollar', currency: 'USD', symbol: '$' },
+  { code: 'vn', name: 'Vietnamese Dong', currency: 'VND', symbol: '₫' },
+  { code: 'za', name: 'South African Rand', currency: 'ZAR', symbol: 'R' },
 ];
 
 const BUDGET_CURRENCIES = ['MYR', 'USD', 'EUR', 'GBP', 'SGD'];
 
-function BudgetSetup({ onNext, converterAmount, converterFromCurrency, rates }) {
-  const [destination, setDestination] = useState(DESTINATIONS[0]);
-  const [budget, setBudget] = useState(converterAmount || '5000');
+function BudgetSetup({ onNext, onBack, converterAmount, converterFromCurrency, converterToCurrency, rates }) {
+  // Automatically match the initial destination component state to the currency from the home screen
+  const [destination, setDestination] = useState(() => {
+    return DESTINATIONS.find((d) => d.currency === converterToCurrency) || DESTINATIONS[15]; // Defaults to JPY if missing
+  });
+  
+  const [budget, setBudget] = useState(converterAmount || '1');
   const [budgetCurrency, setBudgetCurrency] = useState(converterFromCurrency || 'MYR');
   const [duration, setDuration] = useState(1);
   const [tripName, setTripName] = useState('');
@@ -29,12 +57,13 @@ function BudgetSetup({ onNext, converterAmount, converterFromCurrency, rates }) 
 
   const numericBudget = parseFloat(String(budget).replace(/,/g, '')) || 0;
 
-  // Convert budget to destination currency using rates
-  const destRate = rates && rates[destination.currency];
-  const budgetInDest = destRate ? numericBudget * destRate : null;
-
-  // Base rate for display (1 budgetCurrency = X destCurrency)
-  const baseRate = rates && rates[destination.currency] ? rates[destination.currency].toFixed(2) : '—';
+  // Cross-rate calculation handling relative adjustments
+  const rateToSelectedBudget = rates && rates[budgetCurrency] ? rates[budgetCurrency] : 1;
+  const rateToDestination = rates && rates[destination.currency] ? rates[destination.currency] : null;
+  const crossRate = rateToDestination && rateToSelectedBudget ? (rateToDestination / rateToSelectedBudget) : null;
+  
+  const budgetInDest = crossRate ? numericBudget * crossRate : null;
+  const baseRate = crossRate ? crossRate.toFixed(2) : '—';
 
   const handleDurationChange = (delta) => {
     setDuration((prev) => Math.max(1, Math.min(90, prev + delta)));
@@ -53,10 +82,27 @@ function BudgetSetup({ onNext, converterAmount, converterFromCurrency, rates }) 
 
   return (
     <div className="budget-setup">
-      {/* Header */}
-      <div className="budget-setup__header">
-        <h1 className="text-h1">Trip Budget</h1>
-        <p className="text-small">Set up your trip details</p>
+      {/* Header Row */}
+      <div className="budget-setup__header" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button 
+          onClick={onBack}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            color: 'inherit'
+          }}
+          aria-label="Go back"
+        >
+          <IconArrowLeft size={20} />
+        </button>
+        <div>
+          <h1 className="text-h1" style={{ margin: 0 }}>Trip Budget</h1>
+          <p className="text-small" style={{ margin: 0 }}>Set up your trip details</p>
+        </div>
       </div>
 
       {/* Field 1: Destination country */}
@@ -76,12 +122,12 @@ function BudgetSetup({ onNext, converterAmount, converterFromCurrency, rates }) 
           <div className="budget-dropdown">
             {DESTINATIONS.map((d) => (
               <div
-                key={d.code}
-                className={`budget-dropdown__item ${d.code === destination.code ? 'budget-dropdown__item--selected' : ''}`}
+                key={d.currency}
+                className={`budget-dropdown__item ${d.currency === destination.currency ? 'budget-dropdown__item--selected' : ''}`}
                 onClick={() => { setDestination(d); setShowDestDropdown(false); }}
               >
                 <span className={`fi fi-${d.code} budget-field__flag`}></span>
-                <span>{d.name}</span>
+                <span>{d.name} ({d.currency})</span>
               </div>
             ))}
           </div>

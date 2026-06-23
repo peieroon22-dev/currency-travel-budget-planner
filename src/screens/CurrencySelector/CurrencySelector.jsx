@@ -140,9 +140,7 @@ function CurrencySelector({ selectedCode = 'MYR', onSelect, onBack }) {
                 onSelect={onSelect}
               />
             ))}
-            <div className="currency-selector__more">
-              <p className="text-small">+ 150 more currencies</p>
-            </div>
+            {/* 🛠️ Removed the "+ 150 more currencies" container block from here */}
           </div>
         </>
       )}

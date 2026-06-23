@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { IconArrowLeft } from '@tabler/icons-react'; // For utility use if needed elsewhere
 import CurrencyInputCard from '../../components/CurrencyInputCard/CurrencyInputCard';
 import SwapButton from '../../components/SwapButton/SwapButton';
 import Button from '../../components/Button/Button';
@@ -31,7 +32,6 @@ function formatTimeAgo(timestamp) {
   return `Updated ${minutes} min${minutes > 1 ? 's' : ''} ago`;
 }
 
-// 'selectingFor' tells us which pill was tapped: 'from' or 'to'
 function Converter({ onOpenSelector, fromCurrency, toCurrency, onFromCurrencyChange, onToCurrencyChange, onRatesLoaded, onPlanTrip, amount, onAmountChange }) {
   const [rates, setRates] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +69,9 @@ function Converter({ onOpenSelector, fromCurrency, toCurrency, onFromCurrencyCha
   }, []);
 
   const numericAmount = parseFloat(String(amount).replace(/,/g, '')) || 0;
-  const convertedRaw = rates && rates[toCurrency] ? numericAmount * rates[toCurrency] : null;
+  
+  // Guard conversions safely: if toCurrency is empty, return null
+  const convertedRaw = rates && toCurrency && rates[toCurrency] ? numericAmount * rates[toCurrency] : null;
   const convertedAmount = formatAmount(convertedRaw);
 
   const handleAmountChange = (value) => {
@@ -77,7 +79,9 @@ function Converter({ onOpenSelector, fromCurrency, toCurrency, onFromCurrencyCha
     onAmountChange(cleaned);
   };
 
+  // Only allow currency swap if a destination selection exists
   const handleSwap = () => {
+    if (!toCurrency) return; 
     onFromCurrencyChange(toCurrency);
     onToCurrencyChange(fromCurrency);
   };
@@ -110,14 +114,14 @@ function Converter({ onOpenSelector, fromCurrency, toCurrency, onFromCurrencyCha
       <CurrencyInputCard
         label="To"
         amount={convertedAmount}
-        countryCode={CURRENCY_TO_COUNTRY[toCurrency]}
-        currencyCode={toCurrency}
+        countryCode={toCurrency ? CURRENCY_TO_COUNTRY[toCurrency] : ''}
+        currencyCode={toCurrency || '—'}
         variant="dark"
         readOnly
         onCurrencyClick={() => onOpenSelector('to')}
       />
 
-      {rates && rates[toCurrency] && (
+      {rates && toCurrency && rates[toCurrency] && (
         <div className="converter__rate-bar">
           1 {fromCurrency} = {rates[toCurrency].toFixed(2)} {toCurrency} · {formatTimeAgo(fetchedAt)}
         </div>
@@ -139,7 +143,13 @@ function Converter({ onOpenSelector, fromCurrency, toCurrency, onFromCurrencyCha
         ))}
       </div>
 
-      <Button variant="primary" size="default" className="converter__cta" onClick={onPlanTrip}>
+      <Button 
+        variant="primary" 
+        size="default" 
+        className="converter__cta" 
+        onClick={onPlanTrip}
+        disabled={!toCurrency} // Disables navigation if destination currency is missing
+      >
         Plan a trip with this budget →
       </Button>
     </div>

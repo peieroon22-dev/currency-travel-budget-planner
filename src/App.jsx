@@ -7,11 +7,11 @@ import './App.css';
 function App() {
   const [screen, setScreen] = useState('converter');
   const [fromCurrency, setFromCurrency] = useState('MYR');
-  const [toCurrency, setToCurrency] = useState('JPY');
+  const [toCurrency, setToCurrency] = useState(null);
   const [selectingFor, setSelectingFor] = useState(null);
   const [rates, setRates] = useState(null);
   
-  // 1. Added the global amount state here (set to '1' by default)
+  // Added the global amount state here (set to '1' by default)
   const [amount, setAmount] = useState('1'); 
 
   const handleOpenSelector = (which) => {
@@ -44,8 +44,9 @@ function App() {
       <div className="app">
         <BudgetSetup
           rates={rates}
-          converterAmount={amount} // 2. Now passes the dynamic real-time value instead of "5000"
+          converterAmount={amount} 
           converterFromCurrency={fromCurrency}
+          converterToCurrency={toCurrency} // 👈 NEW: Passes 'JPY' (or whatever is selected) to the budget screen
           onNext={(data) => console.log('Budget data:', data)}
           onBack={() => setScreen('converter')}
         />
@@ -64,8 +65,8 @@ function App() {
         onOpenSelector={handleOpenSelector}
         onRatesLoaded={setRates}
         onPlanTrip={() => setScreen('budget')}
-        amount={amount}             // 3. Passes down the current state
-        onAmountChange={setAmount} // 4. Passes down the state updater function
+        amount={amount}             
+        onAmountChange={setAmount} 
       />
     </div>
   );

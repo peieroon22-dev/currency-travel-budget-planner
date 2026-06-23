@@ -7,20 +7,42 @@
   gap: var(--space-2);
 }
 
-/* ---------- HEADER — left aligned ---------- */
+/* ---------- HEADER — left aligned with back button ---------- */
 
 .budget-setup__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   margin-bottom: var(--space-3);
   text-align: left;
 }
 
+.budget-setup__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--color-ink);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: opacity var(--transition-base);
+}
+
+.budget-setup__back:hover {
+  opacity: 0.6;
+}
+
 .budget-setup__header h1 {
+  margin: 0;
   margin-bottom: 2px;
   text-align: left;
   letter-spacing: 0.3px;
 }
 
 .budget-setup__header p {
+  margin: 0;
   text-align: left;
 }
 
@@ -144,8 +166,26 @@
   border-radius: var(--radius-md);
   margin-top: var(--space-1);
   z-index: 10;
-  overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  
+  /* 🛠️ DROPDOWN SCROLLING UPGRADE */
+  max-height: 220px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom internal scrollbar track styling */
+.budget-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.budget-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.budget-dropdown::-webkit-scrollbar-thumb {
+  background-color: var(--color-stone);
+  border-radius: var(--radius-full);
 }
 
 .budget-dropdown__item {

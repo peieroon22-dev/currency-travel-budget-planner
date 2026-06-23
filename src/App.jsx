@@ -1,8 +1,72 @@
+import { useState } from 'react';
+import Converter from './screens/Converter/Converter';
+import CurrencySelector from './screens/CurrencySelector/CurrencySelector';
+import BudgetSetup from './screens/BudgetSetup/BudgetSetup';
+import './App.css';
+
 function App() {
+  const [screen, setScreen] = useState('converter');
+  const [fromCurrency, setFromCurrency] = useState('MYR');
+  const [toCurrency, setToCurrency] = useState('JPY');
+  const [selectingFor, setSelectingFor] = useState(null);
+  const [rates, setRates] = useState(null);
+  
+  // 1. Added the global amount state here (set to '1' by default)
+  const [amount, setAmount] = useState('1'); 
+
+  const handleOpenSelector = (which) => {
+    setSelectingFor(which);
+    setScreen('selector');
+  };
+
+  const handleCurrencySelect = (currency) => {
+    if (selectingFor === 'from') setFromCurrency(currency.code);
+    else setToCurrency(currency.code);
+    setScreen('converter');
+  };
+
+  // SCREEN: Currency Selector
+  if (screen === 'selector') {
+    return (
+      <div className="app">
+        <CurrencySelector
+          selectedCode={selectingFor === 'from' ? fromCurrency : toCurrency}
+          onSelect={handleCurrencySelect}
+          onBack={() => setScreen('converter')}
+        />
+      </div>
+    );
+  }
+
+  // SCREEN: Budget Setup
+  if (screen === 'budget') {
+    return (
+      <div className="app">
+        <BudgetSetup
+          rates={rates}
+          converterAmount={amount} // 2. Now passes the dynamic real-time value instead of "5000"
+          converterFromCurrency={fromCurrency}
+          onNext={(data) => console.log('Budget data:', data)}
+          onBack={() => setScreen('converter')}
+        />
+      </div>
+    );
+  }
+
+  // SCREEN: Default Converter
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Currency & Travel Budget Planner ✈️</h1>
-      <p>Your React app is working!</p>
+    <div className="app">
+      <Converter
+        fromCurrency={fromCurrency}
+        toCurrency={toCurrency}
+        onFromCurrencyChange={setFromCurrency}
+        onToCurrencyChange={setToCurrency}
+        onOpenSelector={handleOpenSelector}
+        onRatesLoaded={setRates}
+        onPlanTrip={() => setScreen('budget')}
+        amount={amount}             // 3. Passes down the current state
+        onAmountChange={setAmount} // 4. Passes down the state updater function
+      />
     </div>
   );
 }

@@ -1,0 +1,68 @@
+.currency-input-card {
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.currency-input-card__label {
+  font-size: var(--text-label);
+  text-align: left;
+}
+
+.currency-input-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.currency-input-card__amount {
+  font-family: var(--font-heading);
+  font-size: var(--text-amount);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+}
+
+.currency-input-card__amount--input {
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+}
+
+.currency-input-card__amount--input::placeholder {
+  color: var(--color-ash);
+  opacity: 0.6;
+}
+
+/* ---------- LIGHT VARIANT ("From" card) ---------- */
+
+.currency-input-card--light {
+  background-color: var(--color-white);
+  border: var(--border-width) solid var(--color-stone);
+}
+
+.currency-input-card--light .currency-input-card__label {
+  color: var(--color-ash);
+}
+
+.currency-input-card--light .currency-input-card__amount {
+  color: var(--color-ink);
+}
+
+/* ---------- DARK VARIANT ("To" card) ---------- */
+
+.currency-input-card--dark {
+  background-color: var(--color-ink);
+}
+
+.currency-input-card--dark .currency-input-card__label {
+  color: var(--color-on-dark-secondary);
+}
+
+.currency-input-card--dark .currency-input-card__amount {
+  color: var(--color-on-dark-primary);
+}

@@ -1,0 +1,83 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  transition: background-color var(--transition-base), opacity var(--transition-base), transform var(--transition-base);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ---------- SIZES ---------- */
+
+.btn--default {
+  height: var(--height-button);
+  padding: 0 var(--space-6);
+  font-size: var(--text-body);
+}
+
+.btn--small {
+  height: var(--height-button-sm);
+  padding: 0 var(--space-4);
+  font-size: var(--text-small);
+}
+
+/* ---------- VARIANTS ---------- */
+
+.btn--primary {
+  background-color: var(--color-ink);
+  color: var(--color-on-dark-primary);
+}
+
+.btn--primary:hover {
+  background-color: var(--color-charcoal);
+}
+
+.btn--secondary {
+  background-color: transparent;
+  color: var(--color-ink);
+  border: var(--border-width) solid var(--color-ink);
+}
+
+.btn--secondary:hover {
+  background-color: var(--color-cream);
+}
+
+.btn--ghost {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  border: var(--border-width) solid var(--color-stone);
+}
+
+.btn--ghost:hover {
+  background-color: var(--color-stone);
+}
+
+/* ---------- ICON ---------- */
+
+.btn__icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.btn--small .btn__icon {
+  font-size: 14px;
+}
+
+/* ---------- FULL WIDTH (used for primary CTAs) ---------- */
+
+.btn--full {
+  width: 100%;
+}

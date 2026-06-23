@@ -1,0 +1,157 @@
+.currency-selector {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- HEADER ---------- */
+
+.currency-selector__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.currency-selector__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink);
+  flex-shrink: 0;
+  transition: opacity var(--transition-base);
+}
+
+.currency-selector__back:hover {
+  opacity: 0.6;
+}
+
+.currency-selector__header h1 {
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+/* ---------- SEARCH BAR ---------- */
+
+.currency-selector__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-white);
+  border: var(--border-width) solid var(--color-stone);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  height: 44px;
+  margin-bottom: var(--space-4);
+}
+
+.currency-selector__search-icon {
+  color: var(--color-ash);
+  flex-shrink: 0;
+}
+
+.currency-selector__search-input {
+  font-size: var(--text-body);
+  color: var(--color-ink);
+  flex: 1;
+}
+
+.currency-selector__search-input::placeholder {
+  color: var(--color-ash);
+}
+
+/* ---------- SECTION LABEL ---------- */
+
+.currency-selector__section-label {
+  margin-bottom: var(--space-2);
+  text-align: left;
+}
+
+/* ---------- LIST CARD ---------- */
+
+.currency-selector__list {
+  background-color: var(--color-white);
+  border: var(--border-width) solid var(--color-stone);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+}
+
+/* ---------- CURRENCY ROW ---------- */
+
+.currency-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-width-thin) solid var(--color-stone);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  min-height: 52px;
+}
+
+.currency-row:last-child {
+  border-bottom: none;
+}
+
+.currency-row:hover {
+  background-color: var(--color-cream);
+}
+
+.currency-row--selected {
+  background-color: var(--color-cream);
+}
+
+.currency-row__flag {
+  width: 22px;
+  height: 16px;
+  border-radius: 2px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.currency-row__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.currency-row__code {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}
+
+.currency-row__name {
+  font-size: var(--text-small);
+  color: var(--color-ash);
+}
+
+.currency-row__check {
+  color: var(--color-ink);
+  flex-shrink: 0;
+}
+
+/* ---------- MORE CURRENCIES FOOTER ---------- */
+
+.currency-selector__more {
+  padding: var(--space-2) var(--space-4);
+  text-align: center;
+  border-top: var(--border-width-thin) solid var(--color-stone);
+}
+
+/* ---------- EMPTY STATE ---------- */
+
+.currency-selector__empty {
+  font-size: var(--text-body);
+  color: var(--color-ash);
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+}

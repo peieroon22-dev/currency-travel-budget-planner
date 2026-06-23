@@ -1,0 +1,49 @@
+.currency-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1) calc(var(--space-1) + 2px); /* 6px gap as per spec */
+  height: var(--height-pill);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  background-color: var(--color-cream);
+  border: var(--border-width) solid var(--color-stone);
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.currency-pill:hover {
+  background-color: #EEEDEA;
+  border-color: #D4D0C8;
+}
+
+.currency-pill:active {
+  transform: scale(0.96);
+}
+
+.currency-pill__code {
+  color: var(--color-ink);
+}
+
+.currency-pill__chevron {
+  color: var(--color-ash);
+}
+
+/* ---------- SHARED ELEMENTS ---------- */
+
+.currency-pill__flag {
+  width: 18px;
+  height: 13px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.currency-pill__code {
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+}
+
+.currency-pill__chevron {
+  flex-shrink: 0;
+}

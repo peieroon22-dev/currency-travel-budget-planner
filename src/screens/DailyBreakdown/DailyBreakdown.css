@@ -1,0 +1,180 @@
+.daily-breakdown {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- HEADER ---------- */
+
+.daily-breakdown__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  text-align: left;
+}
+
+.daily-breakdown__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--color-ink);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: opacity var(--transition-base);
+}
+
+.daily-breakdown__back:hover {
+  opacity: 0.6;
+}
+
+.daily-breakdown__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.daily-breakdown__header-text h2 {
+  margin: 0;
+  text-align: left;
+  letter-spacing: 0.3px;
+}
+
+.daily-breakdown__header-text p {
+  margin: 0;
+  text-align: left;
+}
+
+/* ---------- STAT CARDS ---------- */
+
+.daily-breakdown__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.stat-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-card--dark {
+  background-color: var(--color-ink);
+}
+
+.stat-card--light {
+  background-color: var(--color-white);
+  border: var(--border-width) solid var(--color-stone);
+}
+
+.stat-card__label {
+  font-size: var(--text-label);
+}
+
+.stat-card--dark .stat-card__label {
+  color: var(--color-on-dark-secondary);
+}
+
+.stat-card--light .stat-card__label {
+  color: var(--color-ash);
+}
+
+.stat-card__amount {
+  font-family: var(--font-heading);
+  font-size: var(--text-h2);
+  font-weight: var(--weight-medium);
+  line-height: 1.2;
+}
+
+.stat-card--dark .stat-card__amount {
+  color: var(--color-on-dark-primary);
+}
+
+.stat-card__amount--dark {
+  color: var(--color-ink);
+}
+
+.stat-card__sub {
+  font-size: var(--text-label);
+}
+
+.stat-card--dark .stat-card__sub {
+  color: var(--color-on-dark-secondary);
+}
+
+.stat-card--light .stat-card__sub {
+  color: var(--color-ash);
+}
+
+/* ---------- SECTION LABEL — left aligned ---------- */
+
+.daily-breakdown__section-label {
+  margin-bottom: var(--space-2);
+  margin-top: var(--space-4);
+  text-align: left;
+}
+
+/* ---------- FORMULA CARD ---------- */
+
+.daily-breakdown__formula-card {
+  background-color: var(--color-white);
+  border: var(--border-width) solid var(--color-stone);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.daily-breakdown__formula-text {
+  font-size: var(--text-small);
+  color: var(--color-ash);
+  text-align: left;
+}
+
+/* ---------- ALLOCATION CARD ---------- */
+
+.daily-breakdown__allocation-card {
+  background-color: var(--color-white);
+  border: var(--border-width) solid var(--color-stone);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-6);
+}
+
+.allocation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-width-thin) solid var(--color-stone);
+}
+
+.allocation-row--last {
+  border-bottom: none;
+}
+
+.allocation-row__label {
+  font-size: var(--text-body);
+  color: var(--color-ink);
+}
+
+.allocation-row__value {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+}
+
+/* ---------- CTA ---------- */
+
+.daily-breakdown__cta {
+  width: 100%;
+}

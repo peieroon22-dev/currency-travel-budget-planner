@@ -1,3 +1,69 @@
+/* ==========================================================================
+   1. GLOBAL APP SHELL & NAVIGATION STRUCTURAL LAYOUT
+   ========================================================================== */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--color-cream, #F9F9F8);
+}
+
+.app-main-viewport {
+  flex: 1;
+  padding-bottom: 70px; /* Leaves clear layout margin spacing for floating menu bar overlay */
+  overflow-y: auto;
+}
+
+/* ---------- PERSISTENT NAVIGATION BAR ---------- */
+.app-navigation-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 400px; /* Restricts stretching on expansive desktop views */
+  height: 64px;
+  background-color: #FFFFFF;
+  border-top: 1px solid var(--color-stone, #E5E5E5);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 999;
+}
+
+.nav-tab {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #8E8E93; /* Premium dark neutral gray */
+  cursor: pointer;
+  flex: 1;
+  height: 100%;
+  padding: 4px 0;
+  font-family: var(--font-body), sans-serif;
+  transition: color 0.15s ease-in-out;
+}
+
+.nav-tab span {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.nav-tab--active {
+  color: var(--color-ink, #111111); /* Swaps tint index cleanly to dynamic context color */
+}
+
+
+/* ==========================================================================
+   2. DASHBOARD & NEW UI MODULE COMPONENTS (NESTED SYNTAX)
+   ========================================================================== */
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;

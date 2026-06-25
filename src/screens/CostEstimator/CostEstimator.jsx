@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   IconBed, 
   IconToolsKitchen2, 
@@ -6,8 +6,12 @@ import {
   IconBookmark, 
   IconShare,
   IconArrowLeft,
-  IconAlertTriangle
+  IconAlertTriangle,
+  IconDownload,
+  IconDeviceMobileShare
 } from '@tabler/icons-react';
+import html2canvas from 'html2canvas'; // 🛠️ Import snapshot engine
+import { jsPDF } from 'jspdf';         // 🛠️ Import PDF compiler
 import './CostEstimator.css';
 
 const REAL_WORLD_PROFILES = {
@@ -22,8 +26,12 @@ const REAL_WORLD_PROFILES = {
   MYR: { accommodation: 220, food: 70, transport: 25 }       
 };
 
-// 🛠️ Destructure savedTrips, onSaveTrip, and onUnsaveTrip down from App context
 function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsaveTrip }) {
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false); // 🛠️ Track loading state
+  const shareMenuRef = useRef(null);
+  const estimatorRef = useRef(null); // 🛠️ Reference target for PDF snapshot
+
   const destination = tripData?.destination || { name: 'Taiwan', currency: 'TWD', symbol: 'NT$' };
   const duration = parseInt(tripData?.duration || 1, 10);
   const homeCurrency = tripData?.budgetCurrency || 'MYR';
@@ -58,20 +66,17 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
   const formatDest = (val) => `${destination.symbol}${Math.round(val).toLocaleString()}`;
   const formatHome = (val) => `${homeCurrency} ${Math.round(val / homeToDestExchangeRate).toLocaleString()}`;
 
-  // 🛠️ Dynamic check: See if this specific trip structure already lives inside the saved matching context
   const existingSavedTrip = savedTrips.find(t => 
     t.id === tripData?.id || 
     (t.destination?.name === destination.name && t.duration === duration && t.budget === homeBudget)
   );
   const isSaved = !!existingSavedTrip;
 
-  // 🛠️ Event Toggle Handler logic for executing Save vs Unsave actions
   const handleSaveToggle = () => {
     if (isSaved) {
       if (onUnsaveTrip) onUnsaveTrip(existingSavedTrip.id);
     } else {
       if (onSaveTrip) {
-        // Construct the payload with calculation calculations included for the Saved list layout
         onSaveTrip({
           ...tripData,
           tripName: tripData?.tripName || `${destination.name} Getaway`,
@@ -85,6 +90,95 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
           budgetDifference
         });
       }
+    }
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target)) {
+        setShowShareMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 📄 Core Function: Generates the raw PDF Document internally
+  const generatePDFBlob = async () => {
+    if (!estimatorRef.current) return null;
+    
+    // Add temporary class to cleanly hide background graphics/buttons during canvas mapping
+    estimatorRef.current.classList.add('rendering-pdf');
+
+    // Convert DOM nodes straight to an absolute high-res raster canvas
+    const canvas = await html2canvas(estimatorRef.current, {
+      scale: 2, // Double quality layout density
+      useCORS: true,
+      backgroundColor: '#F9F9F8',
+      // 🔥 FIX 1: Explicitly tell html2canvas to capture the entire scrollable content height
+      windowHeight: estimatorRef.current.scrollHeight 
+    });
+
+    estimatorRef.current.classList.remove('rendering-pdf');
+
+    const imgData = canvas.toDataURL('image/png');
+    
+    // Build standard programmatic print layout document parameters
+    const imgWidth = 210; // Standard reference width in millimeters
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    // 🔥 FIX 2: Instead of forcing a rigid 'a4', pass an array [imgWidth, imgHeight]
+    // This creates a custom dynamic PDF page that perfectly scales to match your exact content size!
+    const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    
+    return { pdfInstance: pdf, blob: pdf.output('blob') };
+  };
+
+  // 📱 Combines PDF generation directly with native device mobile sheet attachments
+  const handleShareAsPDF = async () => {
+    setShowShareMenu(false);
+    setIsGenerating(true);
+
+    try {
+      const pdfData = await generatePDFBlob();
+      if (!pdfData) return;
+
+      // Wrap raw file stream chunk metadata into standard HTML file structure arrays
+      const fileName = `${destination.name}_Travel_Budget.pdf`;
+      const file = new File([pdfData.blob], fileName, { type: 'application/pdf' });
+
+      // Check if modern navigator framework allows file uploads on target operating platform
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `${destination.name} Budget Plan`,
+          text: `Check out my travel calculations report breakdown summary!`,
+        });
+      } else {
+        // Fallback option: If on Desktop system (no mobile share sheet), download file instantly
+        pdfData.pdfInstance.save(fileName);
+      }
+    } catch (err) {
+      console.error('Error generating or sharing file profile layout:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownloadOnly = async () => {
+    setShowShareMenu(false);
+    setIsGenerating(true);
+    try {
+      const pdfData = await generatePDFBlob();
+      if (pdfData) {
+        pdfData.pdfInstance.save(`${destination.name}_Travel_Budget.pdf`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -116,7 +210,7 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
   ];
 
   return (
-    <div className="cost-estimator">
+    <div className="cost-estimator" ref={estimatorRef}>
       
       <div className="cost-estimator__header">
         <button className="cost-estimator__back" onClick={onBack} aria-label="Go back">
@@ -190,11 +284,11 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
         )}
       </div>
 
-      <div className="estimator-actions">
-        {/* 🛠️ Dynamic Button Variant styling classes and Icon Fill triggers applied */}
+      <div className="estimator-actions" ref={shareMenuRef}>
         <button 
           className={`estimator-btn ${isSaved ? 'estimator-btn--saved' : 'estimator-btn--outline'}`}
           onClick={handleSaveToggle}
+          disabled={isGenerating}
         >
           <IconBookmark 
             size={20} 
@@ -204,10 +298,27 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
           {isSaved ? 'Saved' : 'Save trip'}
         </button>
         
-        <button className="estimator-btn estimator-btn--filled">
+        <button 
+          className="estimator-btn estimator-btn--filled"
+          onClick={() => setShowShareMenu(!showShareMenu)}
+          disabled={isGenerating}
+        >
           <IconShare size={20} stroke={1.5} />
-          Share
+          {isGenerating ? 'Compiling PDF...' : 'Share'}
         </button>
+
+        {showShareMenu && (
+          <div className="share-dropdown">
+            <button className="share-dropdown__item" onClick={handleShareAsPDF}>
+              <IconDeviceMobileShare size={18} stroke={1.5} />
+              <span>Share PDF via Apps...</span>
+            </button>
+            <button className="share-dropdown__item" onClick={handleDownloadOnly}>
+              <IconDownload size={18} stroke={1.5} />
+              <span>Download PDF directly</span>
+            </button>
+          </div>
+        )}
       </div>
 
     </div>

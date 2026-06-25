@@ -1,11 +1,12 @@
 .cost-estimator {
   max-width: 400px;
   margin: 0 auto;
-  padding: var(--space-2) var(--space-4) var(--space-4);
+  padding: var(--space-2) var(--space-4) var(--space-2);
   display: flex;
   flex-direction: column;
   background-color: var(--color-cream, #F9F9F8); 
-  min-height: 100vh;
+  min-height: calc(100dvh - 65px);
+  box-sizing: border-box;
 }
 
 /* ---------- HEADER ---------- */
@@ -228,6 +229,8 @@
   display: flex;
   gap: var(--space-3);
   margin-top: auto;
+  margin-bottom: var(--space-2, 8px); 
+  position: relative;
 }
 
 .estimator-btn {
@@ -265,4 +268,104 @@
   background-color: var(--color-stone, #E5E5E5);
   border: var(--border-width, 1px) solid var(--color-stone, #E5E5E5);
   color: var(--color-ink, #111111);
+}
+
+/* ---------- SHARE DROPDOWN CONTAINER ---------- */
+.estimator-actions {
+  position: relative; /* Necessary to tether the overlay option system safely */
+}
+
+.share-dropdown {
+  position: absolute;
+  bottom: 60px;
+  right: 0;
+  width: 200px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-stone, #E5E5E5);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-1, 4px);
+  z-index: 100;
+  animation: slideUpFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.share-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 10px) var(--space-3, 12px);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius-md, 12px) - 4px);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink, #111111);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.share-dropdown__item:hover {
+  background-color: var(--color-cream, #F4F4F5);
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- 📄 NATIVE PRINT / SAVE PDF SPECIFIC RULES ---------- */
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  
+  .cost-estimator {
+    max-width: 100% !important;
+    padding: 0 !important;
+    background: transparent !important;
+    min-height: auto !important;
+  }
+
+  /* Hide interactive buttons, navigation headers and drop overlays from appearing on structural PDF copies */
+  .cost-estimator__back,
+  .estimator-actions,
+  .share-dropdown {
+    display: none !important;
+  }
+
+  .estimator-card {
+    border: 1px solid #CCCCCC !important;
+    box-shadow: none !important;
+  }
+  
+  .estimator-summary--over {
+    background-color: #FFF5F5 !important;
+    border: 1px solid #FDE8E8 !important;
+    -webkit-print-color-adjust: exact; /* Forces background coloring tracking setups for webkit */
+    print-color-adjust: exact;
+  }
+}
+
+/* 🛠️ Utility layout selector logic applied while compiling the file layout context */
+.cost-estimator.rendering-pdf {
+  min-height: auto !important;
+  height: auto !important;
+  padding-bottom: var(--space-4) !important; /* Ensures bottom padding is explicitly preserved in snapshot */
+}
+
+.cost-estimator.rendering-pdf .cost-estimator__back,
+.cost-estimator.rendering-pdf .estimator-actions,
+.cost-estimator.rendering-pdf .share-dropdown {
+  display: none !important;
 }

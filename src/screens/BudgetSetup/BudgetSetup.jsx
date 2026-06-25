@@ -78,7 +78,6 @@ function BudgetSetup({ onNext, onBack, converterAmount, converterFromCurrency, c
   const budgetInDest = crossRate ? numericBudget * crossRate : null;
   const baseRate = crossRate ? crossRate.toFixed(2) : '—';
 
-  // 🛠️ Safely converts current duration state to integer before modifying via step button 
   const handleDurationChange = (delta) => {
     setDuration((prev) => {
       const currentVal = parseInt(String(prev), 10) || 1;
@@ -92,8 +91,9 @@ function BudgetSetup({ onNext, onBack, converterAmount, converterFromCurrency, c
       destination,
       budget: numericBudget,
       budgetCurrency,
-      duration: parseInt(String(duration), 10) || 1, // Fallback check for safe integer passing
-      tripName,
+      duration: parseInt(String(duration), 10) || 1, 
+      /* 🛠️ FIXED: Sets a default dynamic name if input is left blank */
+      tripName: tripName.trim() || `${destination.name} Escape`, 
       budgetInDest,
     });
   };
@@ -188,8 +188,6 @@ function BudgetSetup({ onNext, onBack, converterAmount, converterFromCurrency, c
       <div className="budget-field">
         <p className="budget-field__label">Trip duration</p>
         <div className="budget-field__row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          
-          {/* 🛠️ CHANGED: Static text replaced with an editable input field wrapper */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <input
               className="budget-field__input"
@@ -199,15 +197,15 @@ function BudgetSetup({ onNext, onBack, converterAmount, converterFromCurrency, c
               onChange={(e) => {
                 const val = e.target.value.replace(/[^0-9]/g, '');
                 if (val === '') {
-                  setDuration(''); // Allows clearing input temporarily
+                  setDuration(''); 
                 } else {
                   const num = parseInt(val, 10);
-                  setDuration(Math.min(90, num)); // Max threshold capped at 90 days
+                  setDuration(Math.min(90, num)); 
                 }
               }}
               onBlur={() => {
                 if (!duration || parseInt(String(duration), 10) < 1) {
-                  setDuration(1); // Auto-correct back to 1 if left blank or zero
+                  setDuration(1); 
                 }
               }}
               style={{ width: '50px', textAlign: 'center', padding: '4px 0' }}
@@ -240,7 +238,8 @@ function BudgetSetup({ onNext, onBack, converterAmount, converterFromCurrency, c
           type="text"
           value={tripName}
           onChange={(e) => setTripName(e.target.value)}
-          placeholder="e.g. Japan Summer 2026"
+          /* 🛠️ FIXED: Placeholder text is now dynamically built based on destination selection */
+          placeholder={`e.g. ${destination.name} Escape`}
         />
       </div>
 

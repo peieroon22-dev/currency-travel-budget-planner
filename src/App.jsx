@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import Converter from './screens/Converter/Converter';
 import CurrencySelector from './screens/CurrencySelector/CurrencySelector';
 import BudgetSetup from './screens/BudgetSetup/BudgetSetup';
 import DailyBreakdown from './screens/DailyBreakdown/DailyBreakdown';
 import CostEstimator from './screens/CostEstimator/CostEstimator';
 import SavedTrips from './screens/SavedTrips/SavedTrips'; 
-import { IconCoins, IconWallet, IconCalculator, IconBookmark } from '@tabler/icons-react'; 
+import SplashScreen from './screens/SplashScreen/SplashScreen'; 
+import { IconCurrencyDollar, IconWallet, IconMapPin, IconBookmark } from '@tabler/icons-react'; 
 import './App.css';
 
 function App() {
@@ -17,8 +18,32 @@ function App() {
   const [amount, setAmount] = useState('1');
   const [tripData, setTripData] = useState(null);
   
-  /* 🛠️ REMOVED: Changed initial state to an empty array so there are no preset trips */
-  const [savedTrips, setSavedTrips] = useState([]);
+  const [showSplash, setShowSplash] = useState(true);
+  const [fadeSplash, setFadeSplash] = useState(false);
+  
+  const [savedTrips, setSavedTrips] = useState(() => {
+    const localData = localStorage.getItem('travel_app_saved_trips');
+    return localData ? JSON.parse(localData) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('travel_app_saved_trips', JSON.stringify(savedTrips));
+  }, [savedTrips]);
+
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => {
+      setFadeSplash(true);
+    }, 2000);
+
+    const unmountTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(unmountTimer);
+    };
+  }, []);
 
   const handleOpenSelector = (which) => {
     setSelectingFor(which);
@@ -53,7 +78,7 @@ function App() {
           className={`nav-tab ${screen === 'converter' ? 'nav-tab--active' : ''}`} 
           onClick={() => setScreen('converter')}
         >
-          <IconCoins size={22} />
+          <IconCurrencyDollar size={22} />
           <span>Converter</span>
         </button>
         <button 
@@ -69,7 +94,7 @@ function App() {
           disabled={!tripData}
           style={{ opacity: tripData ? 1 : 0.4 }}
         >
-          <IconCalculator size={22} />
+          <IconMapPin size={22} />
           <span>Estimator</span>
         </button>
         <button 
@@ -151,7 +176,11 @@ function App() {
             onToCurrencyChange={setToCurrency}
             onOpenSelector={handleOpenSelector}
             onRatesLoaded={setRates}
-            onPlanTrip={() => setScreen('budget')}
+            /* 🛠️ FIXED: Reset tripData to null on a new initialization request */
+            onPlanTrip={() => {
+              setTripData(null); 
+              setScreen('budget');
+            }}
             amount={amount}
             onAmountChange={setAmount}
           />
@@ -161,6 +190,8 @@ function App() {
 
   return (
     <div className="app">
+      {showSplash && <SplashScreen fadeOut={fadeSplash} />}
+
       <div className="app-main-viewport">
         {renderScreenContent()}
       </div>

@@ -1,9 +1,8 @@
 .splash-screen {
   position: fixed;
-  top: 0;
-  left: 0;
+  /* 🔥 FIX 1: Use inset for safer cross-browser boundary pinning */
+  inset: 0; 
   width: 100vw;
-  /* 🔥 FIX 1: Use dvh (Dynamic Viewport Height) to bypass mobile address bar shifts */
   height: 100vh;
   height: 100dvh; 
   background-color: #ffffff; 
@@ -28,10 +27,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* 🔥 FIX 2: Prevents text pixelation and jittering during mobile scaling loops */
   will-change: transform;
   animation: splashPulse 2.5s ease-in-out infinite;
   padding: var(--space-4, 16px);
+
+  /* 🔥 FIX 2: Optical vertical correction. 
+     Nudging the container up slightly offsets the heavy bottom mobile browser bar */
+  margin-top: -5dvh; 
 }
 
 /* Micro-interaction animation for the logo container */
@@ -40,6 +42,6 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.03); /* Slightly gentler scale prevents visual jarring */
+    transform: scale(1.03); 
   }
 }

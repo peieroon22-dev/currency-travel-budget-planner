@@ -29,8 +29,9 @@ const REAL_WORLD_PROFILES = {
 function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsaveTrip }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false); 
-  // 🛠️ FIX 1: Track the prepared PDF state container in memory
-  const [preparedPdf, setPreparedPdf] = useState(null); 
+  
+  // 🛠️ FIX 1: Hold the compiled layout metrics globally in a single snapshot payload
+  const [preparedSnapshot, setPreparedSnapshot] = useState(null); 
   
   const shareMenuRef = useRef(null);
   const estimatorRef = useRef(null); 
@@ -106,113 +107,86 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const generatePDFBlob = async () => {
-    if (!estimatorRef.current) return null;
+  // 🛠️ FIX 2: Generate base assets ahead of time to satisfy gesture token windows
+  const handleToggleShareMenu = async () => {
+    const willOpen = !showShareMenu;
+    setShowShareMenu(willOpen);
+
+    if (willOpen && !preparedSnapshot) {
+      setIsGenerating(true);
+      try {
+        if (!estimatorRef.current) return;
+        
+        estimatorRef.current.classList.add('rendering-pdf');
+
+        const canvas = await html2canvas(estimatorRef.current, {
+          scale: 2, 
+          useCORS: true,
+          backgroundColor: '#F9F9F8',
+          windowHeight: estimatorRef.current.scrollHeight 
+        });
+
+        estimatorRef.current.classList.remove('rendering-pdf');
+
+        const imgData = canvas.toDataURL('image/png');
+        
+        // Compile a clean binary blob signature out of the active canvas layer
+        const imageBlob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+
+        setPreparedSnapshot({
+          canvas,
+          imgData,
+          imageBlob
+        });
+      } catch (err) {
+        console.error('Error pre-rendering sharing workspace hooks:', err);
+      } finally {
+        setIsGenerating(false);
+      }
+    }
+  };
+
+  // 📱 🛠️ FIX 3: Natively pass an image file instead of a blocked PDF document stream
+  const handleShareAsImage = async () => {
+    setShowShareMenu(false);
+    if (!preparedSnapshot) return;
+
+    const fileName = `${destination.name}_Travel_Budget.png`;
+    const file = new File([preparedSnapshot.imageBlob], fileName, { type: 'image/png' });
+
+    // Validate if Android / iOS allows standard structural image parsing matrices
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: `${destination.name} Budget Breakdown`,
+          text: `Check out my travel calculations report for ${destination.name}!`,
+        });
+        return; 
+      } catch (err) {
+        console.warn('Native social matrix share sheet dismissed:', err);
+      }
+    }
+
+    // Direct platform fallback: open link canvas if everything else breaks
+    const blobURL = URL.createObjectURL(preparedSnapshot.imageBlob);
+    window.open(blobURL, '_blank');
+  };
+
+  // 📄 🛠️ FIX 4: Re-route formal PDF Generation down to a clean local file compiler
+  const handleDownloadPDF = () => {
+    setShowShareMenu(false);
+    if (!preparedSnapshot) return;
+
+    const { canvas, imgData } = preparedSnapshot;
+    const fileName = `${destination.name}_Travel_Budget.pdf`;
     
-    estimatorRef.current.classList.add('rendering-pdf');
-
-    const canvas = await html2canvas(estimatorRef.current, {
-      scale: 2, 
-      useCORS: true,
-      backgroundColor: '#F9F9F8',
-      windowHeight: estimatorRef.current.scrollHeight 
-    });
-
-    estimatorRef.current.classList.remove('rendering-pdf');
-
-    const imgData = canvas.toDataURL('image/png');
     const imgWidth = 210; 
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
     const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    
-    return { pdfInstance: pdf, blob: pdf.output('blob') };
-  };
-
-  // 🛠️ FIX 2: Intercept menu opens to render the PDF data string completely ahead of time
-  const handleToggleShareMenu = async () => {
-    const willOpen = !showShareMenu;
-    setShowShareMenu(willOpen);
-
-    if (willOpen) {
-      setIsGenerating(true);
-      try {
-        const pdfData = await generatePDFBlob();
-        setPreparedPdf(pdfData);
-      } catch (err) {
-        console.error('Error pre-rendering PDF structure profile:', err);
-      } finally {
-        setIsGenerating(false);
-      }
-    } else {
-      // Flush memory data allocation blocks when container options close down
-      setPreparedPdf(null);
-    }
-  };
-
-  // 📱 Synchronous execution pass maps directly onto internal device hooks cleanly
-  const handleShareAsPDF = async () => {
-    setShowShareMenu(false);
-    
-    // Fallback safeguard catch if background tasks haven't fully processed chunks yet
-    let pdfData = preparedPdf;
-    if (!pdfData) {
-      setIsGenerating(true);
-      pdfData = await generatePDFBlob();
-      setIsGenerating(false);
-    }
-    if (!pdfData) return;
-
-    const fileName = `${destination.name}_Travel_Budget.pdf`;
-    const file = new File([pdfData.blob], fileName, { type: 'application/pdf' });
-
-    // Check if system shares natively
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: `${destination.name} Budget Plan`,
-          text: `Check out my travel calculations report breakdown summary!`,
-        });
-        return; // Complete execution success loop
-      } catch (err) {
-        console.warn('Native application share sheets cancelled or dropped:', err);
-      }
-    }
-
-    // 🛠️ FIX 3: Bulletproof Mobile Fallback.
-    // If browser blocks direct file injection arrays, open object reference streams in 
-    // a fresh viewport context. Mobile devices parse this native browser interface window to allow standard user-triggered downloads.
-    try {
-      const blobURL = URL.createObjectURL(pdfData.blob);
-      window.open(blobURL, '_blank');
-    } catch (e) {
-      pdfData.pdfInstance.save(fileName);
-    }
-  };
-
-  const handleDownloadOnly = () => {
-    setShowShareMenu(false);
-    const fileName = `${destination.name}_Travel_Budget.pdf`;
-    
-    if (preparedPdf) {
-      preparedPdf.pdfInstance.save(fileName);
-    } else {
-      handleDownloadOnlyAsync(fileName);
-    }
-  };
-
-  const handleDownloadOnlyAsync = async (fileName) => {
-    setIsGenerating(true);
-    try {
-      const pdfData = await generatePDFBlob();
-      if (pdfData) pdfData.pdfInstance.save(fileName);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsGenerating(false);
-    }
+    pdf.save(fileName);
   };
 
   const categories = [
@@ -332,21 +306,22 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
         
         <button 
           className="estimator-btn estimator-btn--filled"
-          onClick={handleToggleShareMenu} // 🛠️ Updated click engine trigger target
+          onClick={handleToggleShareMenu} 
+          disabled={isGenerating}
         >
           <IconShare size={20} stroke={1.5} />
-          {isGenerating ? 'Preparing file...' : 'Share'}
+          {isGenerating ? 'Preparing Layout...' : 'Share'}
         </button>
 
         {showShareMenu && (
           <div className="share-dropdown">
-            <button className="share-dropdown__item" onClick={handleShareAsPDF}>
+            <button className="share-dropdown__item" onClick={handleShareAsImage} disabled={!preparedSnapshot}>
               <IconDeviceMobileShare size={18} stroke={1.5} />
-              <span>Share PDF via Apps...</span>
+              <span>Share Card via Apps...</span>
             </button>
-            <button className="share-dropdown__item" onClick={handleDownloadOnly}>
+            <button className="share-dropdown__item" onClick={handleDownloadPDF} disabled={!preparedSnapshot}>
               <IconDownload size={18} stroke={1.5} />
-              <span>Download PDF directly</span>
+              <span>Download PDF File</span>
             </button>
           </div>
         )}

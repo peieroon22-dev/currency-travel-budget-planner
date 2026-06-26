@@ -1,6 +1,5 @@
 .splash-screen {
   position: fixed;
-  /* 🔥 FIX 1: Use inset for safer cross-browser boundary pinning */
   inset: 0; 
   width: 100vw;
   height: 100vh;
@@ -31,9 +30,9 @@
   animation: splashPulse 2.5s ease-in-out infinite;
   padding: var(--space-4, 16px);
 
-  /* 🔥 FIX 2: Optical vertical correction. 
-     Nudging the container up slightly offsets the heavy bottom mobile browser bar */
-  margin-top: -5dvh; 
+  /* 🛠️ FIX: Removed the negative top margin so the flexbox layout 
+     can perfectly center the container horizontally and vertically */
+  margin-top: 0; 
 }
 
 /* Micro-interaction animation for the logo container */

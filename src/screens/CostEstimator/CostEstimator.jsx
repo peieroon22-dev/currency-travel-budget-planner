@@ -10,8 +10,8 @@ import {
   IconDownload,
   IconDeviceMobileShare
 } from '@tabler/icons-react';
-import html2canvas from 'html2canvas'; // 🛠️ Import snapshot engine
-import { jsPDF } from 'jspdf';         // 🛠️ Import PDF compiler
+import html2canvas from 'html2canvas'; 
+import { jsPDF } from 'jspdf';         
 import './CostEstimator.css';
 
 const REAL_WORLD_PROFILES = {
@@ -28,9 +28,12 @@ const REAL_WORLD_PROFILES = {
 
 function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsaveTrip }) {
   const [showShareMenu, setShowShareMenu] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false); // 🛠️ Track loading state
+  const [isGenerating, setIsGenerating] = useState(false); 
+  // 🛠️ FIX 1: Track the prepared PDF state container in memory
+  const [preparedPdf, setPreparedPdf] = useState(null); 
+  
   const shareMenuRef = useRef(null);
-  const estimatorRef = useRef(null); // 🛠️ Reference target for PDF snapshot
+  const estimatorRef = useRef(null); 
 
   const destination = tripData?.destination || { name: 'Taiwan', currency: 'TWD', symbol: 'NT$' };
   const duration = parseInt(tripData?.duration || 1, 10);
@@ -103,78 +106,108 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 📄 Core Function: Generates the raw PDF Document internally
   const generatePDFBlob = async () => {
     if (!estimatorRef.current) return null;
     
-    // Add temporary class to cleanly hide background graphics/buttons during canvas mapping
     estimatorRef.current.classList.add('rendering-pdf');
 
-    // Convert DOM nodes straight to an absolute high-res raster canvas
     const canvas = await html2canvas(estimatorRef.current, {
-      scale: 2, // Double quality layout density
+      scale: 2, 
       useCORS: true,
       backgroundColor: '#F9F9F8',
-      // 🔥 FIX 1: Explicitly tell html2canvas to capture the entire scrollable content height
       windowHeight: estimatorRef.current.scrollHeight 
     });
 
     estimatorRef.current.classList.remove('rendering-pdf');
 
     const imgData = canvas.toDataURL('image/png');
-    
-    // Build standard programmatic print layout document parameters
-    const imgWidth = 210; // Standard reference width in millimeters
+    const imgWidth = 210; 
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
-    // 🔥 FIX 2: Instead of forcing a rigid 'a4', pass an array [imgWidth, imgHeight]
-    // This creates a custom dynamic PDF page that perfectly scales to match your exact content size!
     const pdf = new jsPDF('p', 'mm', [imgWidth, imgHeight]);
-    
     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
     
     return { pdfInstance: pdf, blob: pdf.output('blob') };
   };
 
-  // 📱 Combines PDF generation directly with native device mobile sheet attachments
+  // 🛠️ FIX 2: Intercept menu opens to render the PDF data string completely ahead of time
+  const handleToggleShareMenu = async () => {
+    const willOpen = !showShareMenu;
+    setShowShareMenu(willOpen);
+
+    if (willOpen) {
+      setIsGenerating(true);
+      try {
+        const pdfData = await generatePDFBlob();
+        setPreparedPdf(pdfData);
+      } catch (err) {
+        console.error('Error pre-rendering PDF structure profile:', err);
+      } finally {
+        setIsGenerating(false);
+      }
+    } else {
+      // Flush memory data allocation blocks when container options close down
+      setPreparedPdf(null);
+    }
+  };
+
+  // 📱 Synchronous execution pass maps directly onto internal device hooks cleanly
   const handleShareAsPDF = async () => {
     setShowShareMenu(false);
-    setIsGenerating(true);
+    
+    // Fallback safeguard catch if background tasks haven't fully processed chunks yet
+    let pdfData = preparedPdf;
+    if (!pdfData) {
+      setIsGenerating(true);
+      pdfData = await generatePDFBlob();
+      setIsGenerating(false);
+    }
+    if (!pdfData) return;
 
-    try {
-      const pdfData = await generatePDFBlob();
-      if (!pdfData) return;
+    const fileName = `${destination.name}_Travel_Budget.pdf`;
+    const file = new File([pdfData.blob], fileName, { type: 'application/pdf' });
 
-      // Wrap raw file stream chunk metadata into standard HTML file structure arrays
-      const fileName = `${destination.name}_Travel_Budget.pdf`;
-      const file = new File([pdfData.blob], fileName, { type: 'application/pdf' });
-
-      // Check if modern navigator framework allows file uploads on target operating platform
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    // Check if system shares natively
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
         await navigator.share({
           files: [file],
           title: `${destination.name} Budget Plan`,
           text: `Check out my travel calculations report breakdown summary!`,
         });
-      } else {
-        // Fallback option: If on Desktop system (no mobile share sheet), download file instantly
-        pdfData.pdfInstance.save(fileName);
+        return; // Complete execution success loop
+      } catch (err) {
+        console.warn('Native application share sheets cancelled or dropped:', err);
       }
-    } catch (err) {
-      console.error('Error generating or sharing file profile layout:', err);
-    } finally {
-      setIsGenerating(false);
+    }
+
+    // 🛠️ FIX 3: Bulletproof Mobile Fallback.
+    // If browser blocks direct file injection arrays, open object reference streams in 
+    // a fresh viewport context. Mobile devices parse this native browser interface window to allow standard user-triggered downloads.
+    try {
+      const blobURL = URL.createObjectURL(pdfData.blob);
+      window.open(blobURL, '_blank');
+    } catch (e) {
+      pdfData.pdfInstance.save(fileName);
     }
   };
 
-  const handleDownloadOnly = async () => {
+  const handleDownloadOnly = () => {
     setShowShareMenu(false);
+    const fileName = `${destination.name}_Travel_Budget.pdf`;
+    
+    if (preparedPdf) {
+      preparedPdf.pdfInstance.save(fileName);
+    } else {
+      handleDownloadOnlyAsync(fileName);
+    }
+  };
+
+  const handleDownloadOnlyAsync = async (fileName) => {
     setIsGenerating(true);
     try {
       const pdfData = await generatePDFBlob();
-      if (pdfData) {
-        pdfData.pdfInstance.save(`${destination.name}_Travel_Budget.pdf`);
-      }
+      if (pdfData) pdfData.pdfInstance.save(fileName);
     } catch (err) {
       console.error(err);
     } finally {
@@ -288,7 +321,6 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
         <button 
           className={`estimator-btn ${isSaved ? 'estimator-btn--saved' : 'estimator-btn--outline'}`}
           onClick={handleSaveToggle}
-          disabled={isGenerating}
         >
           <IconBookmark 
             size={20} 
@@ -300,11 +332,10 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
         
         <button 
           className="estimator-btn estimator-btn--filled"
-          onClick={() => setShowShareMenu(!showShareMenu)}
-          disabled={isGenerating}
+          onClick={handleToggleShareMenu} // 🛠️ Updated click engine trigger target
         >
           <IconShare size={20} stroke={1.5} />
-          {isGenerating ? 'Compiling PDF...' : 'Share'}
+          {isGenerating ? 'Preparing file...' : 'Share'}
         </button>
 
         {showShareMenu && (

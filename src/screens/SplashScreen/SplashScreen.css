@@ -1,9 +1,8 @@
 .splash-screen {
   position: fixed;
+  /* 🛠️ FIX 1: Let inset do 100% of the sizing work. It pins the container 
+     strictly to the visible viewport boundaries between the top and bottom bars. */
   inset: 0; 
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh; 
   background-color: #ffffff; 
   display: flex;
   justify-content: center;
@@ -13,6 +12,9 @@
   visibility: visible;
   transition: opacity 0.5s ease, visibility 0.5s ease;
   overflow: hidden;
+
+  /* 🛠️ FIX 2: REMOVED width: 100vw, height: 100vh, and height: 100dvh.
+     This stops the container from leaking off the bottom of the screen. */
 }
 
 /* Smooth fade out state triggered right before unmounting */
@@ -29,9 +31,8 @@
   will-change: transform;
   animation: splashPulse 2.5s ease-in-out infinite;
   padding: var(--space-4, 16px);
-
-  /* 🛠️ FIX: Removed the negative top margin so the flexbox layout 
-     can perfectly center the container horizontally and vertically */
+  
+  /* Kept clean and neutral so flexbox can find the true geometric center */
   margin-top: 0; 
 }
 

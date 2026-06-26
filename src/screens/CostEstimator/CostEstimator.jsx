@@ -116,17 +116,20 @@ function CostEstimator({ tripData, onBack, savedTrips = [], onSaveTrip, onUnsave
       setIsGenerating(true);
       try {
         if (!estimatorRef.current) return;
-        
-        estimatorRef.current.classList.add('rendering-pdf');
 
         const canvas = await html2canvas(estimatorRef.current, {
           scale: 2, 
           useCORS: true,
           backgroundColor: '#F9F9F8',
-          windowHeight: estimatorRef.current.scrollHeight 
+          windowHeight: estimatorRef.current.scrollHeight,
+          
+          onclone: (clonedDoc) => {
+            const clonedEstimator = clonedDoc.querySelector('.cost-estimator');
+            if (clonedEstimator) {
+              clonedEstimator.classList.add('rendering-pdf');
+            }
+          }
         });
-
-        estimatorRef.current.classList.remove('rendering-pdf');
 
         const imgData = canvas.toDataURL('image/png');
         

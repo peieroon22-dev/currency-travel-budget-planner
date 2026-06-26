@@ -1,15 +1,20 @@
 .splash-screen {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #ffffff;
-  z-index: 9999;
+  /* 🛠️ FIX 1: Let inset do 100% of the sizing work. It pins the container 
+     strictly to the visible viewport boundaries between the top and bottom bars. */
+  inset: 0; 
+  background-color: #ffffff; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; 
   opacity: 1;
   visibility: visible;
   transition: opacity 0.5s ease, visibility 0.5s ease;
   overflow: hidden;
+
+  /* 🛠️ FIX 2: REMOVED width: 100vw, height: 100vh, and height: 100dvh.
+     This stops the container from leaking off the bottom of the screen. */
 }
 
 /* Smooth fade out state triggered right before unmounting */
@@ -18,26 +23,25 @@
   visibility: hidden;
 }
 
-/* True centre using transform — immune to parent padding/margin */
 .splash-screen__container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  will-change: transform;
   animation: splashPulse 2.5s ease-in-out infinite;
   padding: var(--space-4, 16px);
+  
+  /* Kept clean and neutral so flexbox can find the true geometric center */
+  margin-top: 0; 
 }
 
 /* Micro-interaction animation for the logo container */
 @keyframes splashPulse {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.03);
+    transform: scale(1.03); 
   }
 }

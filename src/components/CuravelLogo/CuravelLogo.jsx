@@ -1,6 +1,6 @@
 function CuravelLogo({ height = 40 }) {
   return (
-    <svg viewBox="0 0 680 280" style={{ height, width: "auto", display: "block" }}>
+    <svg viewBox="0 0 680 280" preserveAspectRatio="xMidYMid meet" style={{ height, display: 'block', margin: '0 auto' }}>
       <title>Curavel app logo</title>
       <desc>Curavel wordmark with a stylised globe and currency path icon</desc>
 

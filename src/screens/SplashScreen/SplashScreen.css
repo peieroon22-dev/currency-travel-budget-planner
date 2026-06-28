@@ -28,9 +28,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  will-change: transform;
-  animation: splashPulse 2.5s ease-in-out infinite;
-  padding: var(--space-4, 16px);
+  width: 100%;
+  margin: 0;
+  padding: 0;
   
   /* Kept clean and neutral so flexbox can find the true geometric center */
   margin-top: 0; 

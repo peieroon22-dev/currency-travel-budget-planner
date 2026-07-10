@@ -1,16 +1,44 @@
-# React + Vite
+# Curavel (Travel Budget & Planning Web Application)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+# Project Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Curavel is a modern, responsive web application designed to simplify travel preparation and financial management. By consolidating currency conversion, trip cost estimation, and comprehensive budget planning into a single seamless workflow, Curavel helps travelers plan their dream trips without the financial guesswork.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Features
 
-## Expanding the ESLint configuration
+## 1. Interactive Budget Planner
+- Allows users to create, organize, and track multi-category trip budgets.
+- Provides a centralized dashboard to monitor projected expenses against set limits.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 2. Real-Time Currency Converter & Cost Estimator
+- Features built-in currency conversion mechanics tailored for international travel.
+- Provides quick cost estimation tools for flights, accommodations, and daily spending.
+
+---
+
+## 3. PDF Report Export
+- Dynamically generates and downloads formatted PDF documents of your cost estimations.
+- Allows travelers to save offline copies or share itineraries and financial breakdowns with trip partners.
+
+---
+
+## 4. Modern Splash Screen & UI Experience
+- Features a premium animated splash screen built with custom, highly optimized SVG components.
+- Polished layouts ensuring responsive design across desktop and mobile screens.
+
+---
+
+# Tech Stack & Tech Concepts Used
+
+This project showcases clean frontend engineering principles and dynamic client-side utilities:
+
+- ✔ **React.js Engine:** Component-driven frontend architecture utilizing hooks and modular state management.
+- ✔ **Advanced Asset Optimization:** Pixel-perfect rendering and custom layout centering using raw SVG graphics.
+- ✔ **Client-Side Document Compilation:** Integrated PDF generation libraries to assemble file data on-the-fly.
+- ✔ **Cloud-Native Deployment:** Pre-configured and optimized for continuous integration via Vercel.

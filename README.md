@@ -41,4 +41,4 @@ This project showcases clean frontend engineering principles and dynamic client-
 - ✔ **React.js Engine:** Component-driven frontend architecture utilizing hooks and modular state management.
 - ✔ **Advanced Asset Optimization:** Pixel-perfect rendering and custom layout centering using raw SVG graphics.
 - ✔ **Client-Side Document Compilation:** Integrated PDF generation libraries to assemble file data on-the-fly.
-- ✔ **Cloud-Native Deployment:** Pre-configured and optimized for continuous integration via Vercel.
+- ✔ **Deployment:** Vercel (deployment configuration)
